@@ -12,4 +12,10 @@
     <string name="reset">Reset</string>
     <string name="peopleRegex">123456789</string>
     <string name="decimalRegex">123456789.</string>
+    <string name="backButton">Back</string>
+    <string name="tab2">Total Tab:</string>
+    <string name="people2">Number of people:</string>
+    <string name="tip2">Calculated Tip Total:</string>
+    <string name="splitTotal">Split Total:</string>
+    <string name="alignmentText">Alignment Text</string>
 </resources>

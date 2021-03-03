@@ -12,6 +12,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.EditText;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private double inputAmount;
     private double tipMultiplier;
     private EditText people;
+    private RadioGroup tipGroup;
     private EditText tabPrice;
     private EditText tipAmount;
     private Button button;
@@ -34,25 +36,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        tipGroup = (RadioGroup) findViewById(R.id.radioGroup);
         otherTip = (RadioButton) findViewById(R.id.customTip);
         people = (EditText) findViewById(R.id.people);
         tipAmount = (EditText) findViewById(R.id.customTipText);
         tipAmount.setVisibility(View.INVISIBLE);
         button = (Button) findViewById(R.id.calculate);
         tabPrice = (EditText) findViewById(R.id.inputAmount);
-        people.setOnKeyListener(mKeyListener);
-        tipAmount.setOnKeyListener(mKeyListener);
-        tabPrice.setOnKeyListener(mKeyListener);
         Intent i = new Intent(this, SecondActivity.class);
 
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.inputAmount:
+        if (v.getId() == R.id.calculate  && (people.getText() != null) && (tabPrice != null)) {
+            if(!otherTip.isChecked() || (otherTip.isChecked() && tipAmount != null)) {
+                startSecondActivity();
+            }
         }
-        startSecondActivity();
+        else if( v.getId() == R.id.reset){
+            people.setText(null);
+            tabPrice.setText(null);
+            tipAmount.setText(null);
+            tipGroup.clearCheck();
+            tipAmount.setVisibility(View.INVISIBLE);
+        }
     }
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
@@ -80,33 +88,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void startSecondActivity() {
         Intent i = new Intent(this, SecondActivity.class);
-        i.putExtra("text", tabPrice.getText().toString());
+        i.putExtra("totalPrice", tabPrice.getText().toString());
+        i.putExtra("numPeople", people.getText().toString());
+        if(otherTip.isChecked()) {
+            i.putExtra("specialTipBool", true);
+            i.putExtra("tipAmountt", tipAmount.getText().toString());
+        }
+        else {
+            i.putExtra("specialTipBool", false);
+            i.putExtra("tipAmountt", String.valueOf(tipMultiplier));
+        }
         startActivityForResult(i, REQ_CODE);
     }
 
-    private View.OnKeyListener mKeyListener = new View.OnKeyListener() {
-        @Override
-        public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-            switch (v.getId()) {
-                case R.id.inputAmount:
-                    Toast.makeText(MainActivity.this, tabPrice.getText().toString().charAt(0), Toast.LENGTH_SHORT).show();
-                    //if(tabPrice.getText().toString().charAt(0) == '.') {
-                        showErrorAlert("Price is  too low", findViewById(R.id.inputAmount).getId());
-                        //tabPrice.setText(null);
-                    //}
-                    break;
-                case R.id.people:
-                    Toast.makeText(MainActivity.this, people.getText().toString(), Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.customTipText:
-                    Toast.makeText(MainActivity.this, tipAmount.getText().toString(), Toast.LENGTH_SHORT).show();
-                    break;
-            }
-            return false;
-        }
-
-    };
+    //private View.OnKeyListener mKeyListener = new View.OnKeyListener() {
+    //    @Override
+    //    public boolean onKey(View v, int keyCode, KeyEvent event) {
+//
+    //        switch (v.getId()) {
+    //            case R.id.inputAmount:
+    //                Toast.makeText(MainActivity.this, tabPrice.getText().toString().charAt(0), Toast.LENGTH_SHORT).show();
+    //                //if(tabPrice.getText().toString().charAt(0) == '.') {
+    //                    showErrorAlert("Price is  too low", findViewById(R.id.inputAmount).getId());
+    //                    //tabPrice.setText(null);
+    //                //}
+    //                break;
+    //            case R.id.people:
+    //                Toast.makeText(MainActivity.this, people.getText().toString(), Toast.LENGTH_SHORT).show();
+    //                break;
+    //            case R.id.customTipText:
+    //                Toast.makeText(MainActivity.this, tipAmount.getText().toString(), Toast.LENGTH_SHORT).show();
+    //                break;
+    //        }
+    //        return false;
+    //    }
+//
+    //};
     private void showErrorAlert(String errorMessage, final int fieldId) {
         new AlertDialog.Builder(this)
                 .setTitle("Error")

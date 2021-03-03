@@ -1,22 +1,26 @@
 package com.example.tipcalculator_mccarty;
 
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SecondActivity extends AppCompatActivity{
-    private int image;
-    private TextView text;
+import org.w3c.dom.Text;
+
+public class SecondActivity extends AppCompatActivity implements View.OnClickListener{
+    private float tabDoub;
+    private float peopleInt;
+    private float tipAmount;
+    private float totalDoub;
+    private TextView tab;
+    private TextView people;
+    private TextView tipNum;
+    private TextView total;
 
     private ConstraintLayout setBackground;
     Intent i = new Intent();
@@ -26,18 +30,30 @@ public class SecondActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
-        text = findViewById(R.id.textView);
-        String viewText = getIntent().getExtras().getString("text");
-        text.setText(viewText);
-
-
-    //   setOnClickListener(new View.OnClickListener(){
-    //        @Override
-    //        public void onClick(View v) {
-    //
-    //            finish();
-    //        }
-    //    });
+        tab = (TextView) findViewById(R.id.tabAmount);
+        people = (TextView) findViewById(R.id.totalPeopleTab);
+        tipNum = (TextView) findViewById(R.id.tipAmountCalced);
+        total = (TextView) findViewById(R.id.totalPrice);
+        try {
+            tabDoub = Float.valueOf(getIntent().getExtras().getString("totalPrice"));
+            peopleInt = Float.valueOf(getIntent().getExtras().getString("numPeople"));
+            tipAmount = Float.valueOf(getIntent().getExtras().getString("tipAmountt"));
+        }
+        catch (NumberFormatException | NullPointerException e) {
+            Toast.makeText(getApplicationContext(), String.valueOf(e), Toast.LENGTH_LONG).show();
+        }
+        //peopleInt = Integer.parseInt(getIntent().getExtras().getString("numPeople"));
+        //tipAmount = Float.parseFloat(getIntent().getExtras().getString("tipAmount"));
+        if(getIntent().getExtras().getBoolean("specialTipBool")) {
+            totalDoub = (((tabDoub + tipAmount) / peopleInt));
+        }
+        else {
+            totalDoub = (((tabDoub + (tabDoub * tipAmount)) / peopleInt));
+        }
+        tab.setText(String.valueOf(tabDoub));
+        people.setText(String.valueOf(peopleInt));
+        tipNum.setText(String.valueOf(tipAmount * tabDoub));
+        total.setText(String.valueOf(totalDoub));
     }
 
     //@Override
@@ -55,8 +71,12 @@ public class SecondActivity extends AppCompatActivity{
 
     @Override
     public void finish() {
-        i.putExtra("image", image);
         setResult(1, i);
         super.finish();
+    }
+
+    @Override
+    public void onClick(View v) {
+        finish();
     }
 }
