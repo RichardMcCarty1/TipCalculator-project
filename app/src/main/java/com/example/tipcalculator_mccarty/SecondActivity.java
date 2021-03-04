@@ -1,6 +1,7 @@
 package com.example.tipcalculator_mccarty;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -42,8 +43,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         catch (NumberFormatException | NullPointerException e) {
             Toast.makeText(getApplicationContext(), String.valueOf(e), Toast.LENGTH_LONG).show();
         }
-        //peopleInt = Integer.parseInt(getIntent().getExtras().getString("numPeople"));
-        //tipAmount = Float.parseFloat(getIntent().getExtras().getString("tipAmount"));
         if(getIntent().getExtras().getBoolean("specialTipBool")) {
             totalDoub = (((tabDoub + tipAmount) / peopleInt));
         }
@@ -54,6 +53,22 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         people.setText(String.valueOf(peopleInt));
         tipNum.setText(String.valueOf(tipAmount * tabDoub));
         total.setText(String.valueOf(totalDoub));
+    }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putFloat("tabDoub", tabDoub);
+        outState.putFloat("peopleInt", peopleInt);
+        outState.putFloat("tipAmount", tipAmount);
+        outState.putFloat("totalDoub", totalDoub);
+        super.onSaveInstanceState(outState);
+    }
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        tab.setText(String.valueOf(savedInstanceState.getFloat("tabdoub")));
+        people.setText(String.valueOf(savedInstanceState.getFloat("peopleInt")));
+        tipNum.setText(String.valueOf(savedInstanceState.getFloat("tipAmount")));
+        total.setText(String.valueOf(savedInstanceState.getFloat("totalDoub")));
     }
 
     //@Override

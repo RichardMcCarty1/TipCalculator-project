@@ -1,5 +1,6 @@
 package com.example.tipcalculator_mccarty;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,14 +9,22 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.EditText;
+
+import org.w3c.dom.Text;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Double.parseDouble;
 
@@ -43,8 +52,112 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tipAmount.setVisibility(View.INVISIBLE);
         button = (Button) findViewById(R.id.calculate);
         tabPrice = (EditText) findViewById(R.id.inputAmount);
+        tabPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if((tabPrice.getText() != null) && s.toString().trim().length()>0) {
+                    Toast.makeText(getApplicationContext(), tabPrice.getText(), Toast.LENGTH_SHORT).show();
+                    if (tabPrice.getText().toString().charAt(0) == '.') {
+                        showErrorAlert("Price is  too low", findViewById(R.id.inputAmount).getId());
+                        tabPrice.setText(null);
+                    }
+                }
+            }
+        });
+        people.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if((people.getText() != null)  && s.toString().trim().length()>0) {
+                    if(Float.valueOf(people.getText().toString()) < 1) {
+                        showErrorAlert("Number of people is too low", findViewById(R.id.inputAmount).getId());
+                        people.setText(null);
+                    }
+                }
+            }
+        });
+        tipAmount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if((tipAmount.getText() != null) && s.toString().trim().length()>0) {
+                    if(Float.valueOf(tipAmount.getText().toString()) < 1) {{
+                        showErrorAlert("Tip is too low", findViewById(R.id.inputAmount).getId());
+                        tipAmount.setText(null);
+                    }}
+                }
+            }
+        });
         Intent i = new Intent(this, SecondActivity.class);
 
+    }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        if(tabPrice.getText() != null) {
+            outState.putString("tabPrice", tabPrice.getText().toString());
+        }
+        else {
+            outState.putString("tabPrice", "");
+        }
+        if(people.getText() != null) {
+            outState.putString("people", people.getText().toString());
+        }
+        else {
+            outState.putString("people", "");
+        }
+        if(tipAmount.getText() != null) {
+            outState.putString("tipAmount", tipAmount.getText().toString());
+        }
+        else {
+            outState.putString("tipAmount", "");
+        }
+        if(tipGroup.getCheckedRadioButtonId() != -1) {
+            outState.putInt("tipGroup", tipGroup.getCheckedRadioButtonId());
+            if(tipGroup.getCheckedRadioButtonId() != R.id.customTip) {
+                outState.putDouble("tipMulti", tipMultiplier);
+            }
+        }
+        else {
+            outState.putString("tipGroup", "");
+        }
+        super.onSaveInstanceState(outState);
+    }
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        tabPrice.setText(savedInstanceState.getString("tabPrice"));
+        people.setText(savedInstanceState.getString("people"));
+        tipAmount.setText(savedInstanceState.getString("tipAmount"));
+        tipGroup.check(savedInstanceState.getInt("tipGroup"));
+        tipMultiplier = savedInstanceState.getDouble("tipMulti", 0);
     }
 
     @Override
@@ -104,25 +217,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //private View.OnKeyListener mKeyListener = new View.OnKeyListener() {
     //    @Override
     //    public boolean onKey(View v, int keyCode, KeyEvent event) {
-//
     //        switch (v.getId()) {
     //            case R.id.inputAmount:
-    //                Toast.makeText(MainActivity.this, tabPrice.getText().toString().charAt(0), Toast.LENGTH_SHORT).show();
-    //                //if(tabPrice.getText().toString().charAt(0) == '.') {
-    //                    showErrorAlert("Price is  too low", findViewById(R.id.inputAmount).getId());
-    //                    //tabPrice.setText(null);
-    //                //}
+    //                if(tabPrice.getText() != null) {
+    //                    Toast.makeText(getApplicationContext(), tabPrice.getText(), Toast.LENGTH_SHORT).show();
+    //                    if (tabPrice.getText().toString().charAt(0) == '.') {
+    //                        showErrorAlert("Price is  too low", findViewById(R.id.inputAmount).getId());
+    //                        tabPrice.setText(null);
+    //                    }
+    //                    return true;
+    //                }
     //                break;
     //            case R.id.people:
-    //                Toast.makeText(MainActivity.this, people.getText().toString(), Toast.LENGTH_SHORT).show();
+    //                if(people.getText() != null) {
+    //                    if(Float.valueOf(people.getText().toString()) < 1) {
+    //                        showErrorAlert("Number of people is too low", findViewById(R.id.inputAmount).getId());
+    //                        people.setText(null);
+    //                    }
+    //                    return true;
+    //                }
     //                break;
     //            case R.id.customTipText:
-    //                Toast.makeText(MainActivity.this, tipAmount.getText().toString(), Toast.LENGTH_SHORT).show();
+    //                if(tipAmount.getText() != null) {
+    //                if(Float.valueOf(tipAmount.getText().toString()) < 1) {{
+    //                    showErrorAlert("Tip is too low", findViewById(R.id.inputAmount).getId());
+    //                    tipAmount.setText(null);
+    //                }}
+    //                return true;
+    //                }
     //                break;
     //        }
     //        return false;
     //    }
-//
     //};
     private void showErrorAlert(String errorMessage, final int fieldId) {
         new AlertDialog.Builder(this)
